@@ -1,7 +1,10 @@
 ### BOM Tool -- Python API tool to manage Sun Devil Rocketry 
 ###             PCB BOMs
 
-from pprint import pprint
+# Google Sheets API includes
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
 
 # PCB class -- contains PCB information extracted from pcbs.txt
 class pcb: 
@@ -78,3 +81,9 @@ rev = getOption(rev, numrevs)
 
 # Load the spreadsheet
 url = pcbs.pcbs[pcbChoiceNum][rev]
+gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
+gsheet_client = gspread.authorize(gsheet_creds)
+bom = gsheet_client.open_by_url(url).sheet1
+
+val = bom.acell('B11').value
+print(val)
