@@ -90,7 +90,7 @@ url = pcbs.pcbs[pcbChoiceNum][rev]
 gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
 gsheet_client = gspread.authorize(gsheet_creds)
 print('loading BOM spreadsheet...')
-bom = gsheet_client.open_by_url(url).sheet1
+bom = gsheet_client.open_by_url(url)
 print('BOM successfully loaded into program')
 
 # Enter program loop
@@ -100,6 +100,6 @@ while(True):
    userin = input("BOM> ")
   
    # Parse respond to user input
-   commands.parseInput(userin)
+   commands.parseInput(userin, bom)
 
 ### PROGRAM END
