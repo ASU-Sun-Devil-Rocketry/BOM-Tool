@@ -1,4 +1,4 @@
-L0001 Instrumentation Amplifier 
+L0001 Instrumentation Amplifier
 https://docs.google.com/spreadsheets/d/1BPhv5EBe08OHnzV4sMC3pmC9x4Lj1s5_EVkWZVgrQcw/edit#gid=0
 https://docs.google.com/spreadsheets/d/1LedlllfJrUL5ZQ_SRYGmqfXZI2CgvUeyWzHi8zJfm40/edit#gid=0
 L0002 Liquid Engine Controller
@@ -18,7 +18,7 @@ A0003 5V Buck Converter
 https://docs.google.com/spreadsheets/d/1CnGZpvxSSALt8u0RBxSUZnL-a7DF-0lTtVObhIT-vaU/edit#gid=0
 A0004 SWD Adapter
 https://docs.google.com/spreadsheets/d/1vORCdKZBHWblkfHSKkByFcQIHybK4WTlZP5FBGmzJ_U/edit#gid=0
-H0001 Solenoid Driver 
+H0001 Solenoid Driver
 https://docs.google.com/spreadsheets/d/1L4K8feXX-7GgufBCPPjz7EW4kNge-N-GxcCC9-Ays68/edit#gid=0
-S0001 ACSB Data Aquisition 
+S0001 ACSB Data Aquisition
 https://docs.google.com/spreadsheets/d/14p2ooyGH1i7RyD05mE_vuyHvFOGMadvgb9ZogAN78Ow/edit#gid=0
