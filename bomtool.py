@@ -83,7 +83,11 @@ rev = getOption(rev, numrevs)
 url = pcbs.pcbs[pcbChoiceNum][rev]
 gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
 gsheet_client = gspread.authorize(gsheet_creds)
+print('loading BOM spreadsheet...')
 bom = gsheet_client.open_by_url(url).sheet1
+print('BOM successfully loaded into program')
 
-val = bom.acell('B11').value
-print(val)
+# Command prompt: 
+userin = input("BOM> ")
+
+
