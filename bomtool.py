@@ -57,13 +57,24 @@ def getOption(choice, options):
 
 # Load PCBs from txt file
 pcbs = pcb("pcbs.txt")
+pcbtable = []
 print('Loading PCBs...\n')
 
 # Display PCB Menu
 print('Choose a PCB: ')
 for count,board in enumerate(pcbs.pcbs, 1):
     print('\t{}. {} - {}'.format(count, board, pcbs.pcbs[board][0]))
+    pcbtable.append(board)
 
 # Get User Choice
 pcbChoice = input("Selection: ")
 pcbChoice = getOption(pcbChoice, pcbs.numpcbs) 
+pcbChoiceNum = pcbtable[pcbChoice-1] 
+
+# Get User choice of revision number
+rev = input("Enter the PCB revision: ")
+numrevs = len(pcbs.pcbs[pcbChoiceNum]) -1
+rev = getOption(rev, numrevs)
+
+# Load the spreadsheet
+url = pcbs.pcbs[pcbChoiceNum][rev]
