@@ -6,6 +6,12 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
 
+# Standard imports
+import sys
+
+# Custom modules
+import commands
+
 # PCB class -- contains PCB information extracted from pcbs.txt
 class pcb: 
 
@@ -87,7 +93,13 @@ print('loading BOM spreadsheet...')
 bom = gsheet_client.open_by_url(url).sheet1
 print('BOM successfully loaded into program')
 
-# Command prompt: 
-userin = input("BOM> ")
+# Enter program loop
+while(True):
 
+   # Command prompt: 
+   userin = input("BOM> ")
+  
+   # Parse respond to user input
+   commands.parseInput(userin)
 
+### PROGRAM END
