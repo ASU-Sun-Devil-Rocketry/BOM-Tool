@@ -26,10 +26,9 @@ class pcb:
            else: 
                self.pcbnum = line[0:5]
                self.pcbs[self.pcbnum] = [line[6:-1]]
-        pprint(self.pcbs)
 
-
-         
+        # Determine Number of PCBs
+        self.numpcbs = len(self.pcbs)
 
 # getOption -- Recursively ask the user for a new selection
 #              until a valid option is entered
@@ -58,5 +57,13 @@ def getOption(choice, options):
 
 # Load PCBs from txt file
 pcbs = pcb("pcbs.txt")
+print('Loading PCBs...\n')
 
 # Display PCB Menu
+print('Choose a PCB: ')
+for count,board in enumerate(pcbs.pcbs, 1):
+    print('\t{}. {} - {}'.format(count, board, pcbs.pcbs[board][0]))
+
+# Get User Choice
+pcbChoice = input("Selection: ")
+pcbChoice = getOption(pcbChoice, pcbs.numpcbs) 
