@@ -15,6 +15,26 @@ prodBomHead = ['Item No.', 'Designator', 'Qty', 'Mfg Part No.',
 # Number of header columns
 prodBomHeadCols = 7
 # Header Formats
+lightColor = {
+                 "backgroundColorStyle": {
+                    "rgbColor": {
+                        "red": 256 - 239,
+                        "green": 256 - 239,
+                        "blue": 256 - 239,
+                     }
+                  }
+               }
+darkColor = {
+                "backgroundColorStyle": {
+                    "rgbColor": {
+                        "red": 256 - 204,
+                        "green": 256 - 204,
+                        "blue": 256 - 204
+                     }
+                  }
+             }
+
+
 # exitFunc -- quits the program
 def exitBOM(bom):
    sys.exit()
@@ -72,27 +92,12 @@ def newProdBom(bom):
                                   }
                               } 
                            })
-   prodBom.format("A1:H6", {
-                               "backgroundColorStyle": {
-                                    "rgbColor": {
-                                        "red": 256 - 239,
-                                        "green": 256 - 239,
-                                        "blue": 256 - 239,
-                                    }
-                                }
-                           })
-   prodBom.format("A7:H7", {
-                               "backgroundColorStyle": {
-                                   "rgbColor": {
-                                       "red": 256 - 204,
-                                       "green": 256 - 204,
-                                       "blue": 256 - 204
-                                    }
-                               }
-                           })
+   prodBom.format("A1:H6", lightColor)
+   prodBom.format("A7:H7", darkColor)
 
    # Loop over components and add data
-
+    
+   
    # exit
    return(None)
 
