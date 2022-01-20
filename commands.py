@@ -6,15 +6,20 @@
 # Standard Imports
 import sys
 from datetime import date
+import time
 
 ## Production BOM Basic Data
 
+# Convert Numbers to Letters
+ExcelCols = ['Null', 'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+
 # Table Headers
-prodBomHead = ['Item No.', 'Designator', 'Qty', 'Mfg Part No.', 
+prodBomHead = ['Item No.', 'Designator', 'Qty','Manufacturer', 'Mfg Part No.', 
                 'Description/Value', 'Package/Footprint', 'Type', 'Notes']
-# Number of header columns
-prodBomHeadCols = 7
-# Header Formats
+# Number of header rows 
+prodBomHeadRows = 7
+
+# Table Colors 
 lightColor = {
                  "backgroundColorStyle": {
                     "rgbColor": {
@@ -54,29 +59,20 @@ def newProdBom(bom):
    prodBom = bom.add_worksheet(title="Production BOM", rows="100", cols="20") 
 
    # Generate Header
-   prodBom.merge_cells("A1:H2")
-   prodBom.merge_cells("B3:H6", 'MERGE_ROWS')
-   for count,header in enumerate(prodBomHead, 1):
-       prodBom.update_cell(prodBomHeadCols, count, header)
+   prodBom.merge_cells("A1:I2")
+   prodBom.merge_cells("B3:I6", 'MERGE_ROWS')
+   prodBom.update("A7:I7", [prodBomHead])
    title = designBom.acell("A1").value.split()
    title.insert(-1, "Production")
    title = ' '.join(title)
    prodBom.update("A1", title)
    prodBom.format("A1", {"textFormat": {"bold": True,
                          "fontSize": 18}})
-   prodBom.update("A3", "Project: ")
-   project = designBom.acell("B3").value
-   prodBom.update("B3", project)
-   prodBom.update("A4", "Revision: ")
-   rev = designBom.acell("B4").value
-   prodBom.update("B4", rev)
-   prodBom.update("A5", "Date: ")
+   designHeadData = designBom.batch_get(["A3:B6"])
+   prodBom.update("A3:B6", designHeadData[0])
    today = date.today().strftime("%m/%d/%Y")
    prodBom.update("B5", today)
-   prodBom.update("A6", "Author:  ")
-   author = designBom.acell("B6").value
-   prodBom.update("B6", author)
-   prodBom.format("A1:H7", {
+   prodBom.format("A1:I7", {
                               "borders": {
                                   "top": {
                                       "style": "SOLID"
@@ -92,12 +88,68 @@ def newProdBom(bom):
                                   }
                               } 
                            })
-   prodBom.format("A1:H6", lightColor)
-   prodBom.format("A7:H7", darkColor)
+   prodBom.format("A1:I6", lightColor)
+   prodBom.format("A7:I7", darkColor)
 
-   # Loop over components and add data
-    
+   ## Loop over components and add data
+
+   # Pull headers to determine target column numbers
+   designHeaders = designBom.row_values(prodBomHeadRows)
+
+   # Assign Each header a column number
+   designHeaderMap = [4, 0, 2, 3, 1, 5, 6]
+   baseDesignRow = 8
+   designNumParts = len(designBom.col_values(1)) -8
+   designTableA = ['A8:G'+str(len(designBom.col_values(1)))]
+   partData = designBom.batch_get(designTableA)[0]
+   prodPartData = []
+   for row in partData:
+       if len(row) == 7:
+          prodPartData.append(list(row))
+          for count, col in enumerate(designHeaderMap):
+              prodPartData[-1][count] = row[col]
+
+   # Write Data from lists to spreadsheet
+   prodTableA = 'B8:H'+str(baseDesignRow+len(prodPartData))
+   prodBom.update(prodTableA, prodPartData)
+   itemNos = [*range(1, len(prodPartData)+1)] 
+   itemNosV = [[x] for x in itemNos]
+   prodFinalRow = baseDesignRow+len(prodPartData)-1
+   itemNosTableA = 'A8:A'+str(prodFinalRow)
+   prodBom.update(itemNosTableA, itemNosV)
+   prodBom.format(itemNosTableA, {"horizontalAlignment": "LEFT"})
    
+   # Add background color
+   prodPartDataTableA = 'A8:I'+str(prodFinalRow)
+   prodBom.format(prodPartDataTableA, {
+                              "borders": {
+                                  "top": {
+                                      "style": "SOLID"
+                                  },
+                                  "bottom": {
+                                      "style": "SOLID"
+                                  },
+                                  "left": {
+                                      "style": "SOLID"
+                                  },
+                                  "right": {
+                                      "style": "SOLID"
+                                  }
+                              } 
+                           })
+   prodPartsTableA = 'A8:I'+str(prodFinalRow)
+   prodBom.format(prodPartsTableA, lightColor)
+
+   # Make every other row dark
+   row = 9 
+   while row <= prodFinalRow:
+       prodRowTablesA = 'A'+str(row)+':I'+str(row)
+       row+=2
+       prodBom.format(prodRowTablesA, darkColor)
+   # Write Marker Data to random cell to indicate bom 
+   # was auto-generated
+   prodBom.update("T100", "AUTO-GENERATED")
+
    # exit
    return(None)
 
