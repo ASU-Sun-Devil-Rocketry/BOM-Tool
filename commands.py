@@ -16,28 +16,75 @@ ExcelCols = ['Null', 'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 # Table Headers
 prodBomHead = ['Item No.', 'Designator', 'Qty','Manufacturer', 'Mfg Part No.', 
                 'Description/Value', 'Package/Footprint', 'Type', 'Notes']
+
 # Number of header rows 
 prodBomHeadRows = 7
 
 # Table Colors 
+lightGray = 239 
+darkGray = 204
+tableBorderGray = 220
 lightColor = {
                  "backgroundColorStyle": {
                     "rgbColor": {
-                        "red": 256 - 239,
-                        "green": 256 - 239,
-                        "blue": 256 - 239,
+                        "red": 256 - lightGray,
+                        "green": 256 - lightGray,
+                        "blue": 256 - lightGray,
                      }
                   }
                }
 darkColor = {
                 "backgroundColorStyle": {
                     "rgbColor": {
-                        "red": 256 - 204,
-                        "green": 256 - 204,
-                        "blue": 256 - 204
+                        "red": 256 - darkGray,
+                        "green": 256 - darkGray,
+                        "blue": 256 - darkGray
                      }
                   }
              }
+
+defaultFormat = {  
+                    "backgroundColor": {
+                        "red": 1 ,
+                        "green": 1,
+                        "blue": 1 
+                    },
+
+                    "borders": {
+                        "top": {
+                            "style": "SOLID", 
+                            "color": {
+                                "red": 256 - tableBorderGray,
+                                "green": 256 - tableBorderGray,
+                                "blue": 256 - tableBorderGray
+                            }
+                         },
+                        "bottom": {
+                            "style": "SOLID",
+                            "color": {
+                                "red": 256 - tableBorderGray,
+                                "green": 256 - tableBorderGray,
+                                "blue": 256 - tableBorderGray
+                            }
+                        },
+                        "left": {
+                            "style": "SOLID",
+                            "color": {
+                                "red": 256 - tableBorderGray,
+                                "green": 256 - tableBorderGray,
+                                "blue": 256 - tableBorderGray
+                            }
+                        },
+                        "right": {
+                            "style": "SOLID", 
+                            "color": {
+                                "red": 256 - tableBorderGray,
+                                "green": 256 - tableBorderGray,
+                                "blue": 256 - tableBorderGray
+                            }
+                        }
+                    } 
+                }
 
 
 # exitFunc -- quits the program
@@ -48,48 +95,54 @@ def exitBOM(bom):
 def helpFunc(bom):
     print('BOM Tool Commands: \n')
 
+# genBomHeader -- Generates the production bom header 
+#                 format
+# input: bom spreadsheet object
+def genBomHeader(bom):
+    designBom = bom.get_worksheet(0)
+    prodBom = bom.get_worksheet(1)
+
+    # Generate Header
+    prodBom.merge_cells("A1:I2")
+    prodBom.merge_cells("B3:I6", 'MERGE_ROWS')
+    prodBom.update("A7:I7", [prodBomHead])
+    title = designBom.acell("A1").value.split()
+    title.insert(-1, "Production")
+    title = ' '.join(title)
+    prodBom.update("A1", title)
+    prodBom.format("A1", {"textFormat": {"bold": True,
+                          "fontSize": 18}})
+    designHeadData = designBom.batch_get(["A3:B6"])
+    prodBom.update("A3:B6", designHeadData[0])
+    today = date.today().strftime("%m/%d/%Y")
+    prodBom.update("B5", today)
+    prodBom.format("A1:I7", {
+                               "borders": {
+                                   "top": {
+                                       "style": "SOLID"
+                                   },
+                                   "bottom": {
+                                       "style": "SOLID"
+                                   },
+                                   "left": {
+                                       "style": "SOLID"
+                                   },
+                                   "right": {
+                                       "style": "SOLID"
+                                   }
+                               } 
+                            })
+    prodBom.format("A1:I6", lightColor)
+    prodBom.format("A7:I7", darkColor)
+
+
 # newProdBom -- creates new production bom
 # input: bom spreadsheet object
-def newProdBom(bom):
+def genProdBom(bom):
 
-   # Design BOM
-   designBom = bom.sheet1
-
-   # create the new sheet
-   prodBom = bom.add_worksheet(title="Production BOM", rows="100", cols="20") 
-
-   # Generate Header
-   prodBom.merge_cells("A1:I2")
-   prodBom.merge_cells("B3:I6", 'MERGE_ROWS')
-   prodBom.update("A7:I7", [prodBomHead])
-   title = designBom.acell("A1").value.split()
-   title.insert(-1, "Production")
-   title = ' '.join(title)
-   prodBom.update("A1", title)
-   prodBom.format("A1", {"textFormat": {"bold": True,
-                         "fontSize": 18}})
-   designHeadData = designBom.batch_get(["A3:B6"])
-   prodBom.update("A3:B6", designHeadData[0])
-   today = date.today().strftime("%m/%d/%Y")
-   prodBom.update("B5", today)
-   prodBom.format("A1:I7", {
-                              "borders": {
-                                  "top": {
-                                      "style": "SOLID"
-                                  },
-                                  "bottom": {
-                                      "style": "SOLID"
-                                  },
-                                  "left": {
-                                      "style": "SOLID"
-                                  },
-                                  "right": {
-                                      "style": "SOLID"
-                                  }
-                              } 
-                           })
-   prodBom.format("A1:I6", lightColor)
-   prodBom.format("A7:I7", darkColor)
+   # Open BOM Sheets
+   designBom = bom.get_worksheet(0)
+   prodBom = bom.get_worksheet(1)
 
    ## Loop over components and add data
 
@@ -161,26 +214,20 @@ def newProdBom(bom):
 def editProdBom(bom):
 
     # production bom sheet
+    designBom = bom.get_worksheet(0)
     prodBom = bom.get_worksheet(1)
 
     # Update date of generation
     today = date.today().strftime("%m/%d/%Y")
     prodBom.update("B5", today)
 
-    # Generate Production BOM Data
-    designHeaderMap = [4, 0, 2, 3, 1, 5, 6]
-    baseDesignRow = 8
-    designNumParts = len(designBom.col_values(1)) -8
-    designTableA = ['A8:G'+str(len(designBom.col_values(1)))]
-    partData = designBom.batch_get(designTableA)[0]
-    prodPartData = []
-    for row in partData:
-        if len(row) == 7:
-           prodPartData.append(list(row))
-           for count, col in enumerate(designHeaderMap):
-               prodPartData[-1][count] = row[col]
+    # Delete Extra BOM entries
+    prodBomSheetSize = len(designBom.col_values(1))
+    prodBom.batch_clear(["A"+str(prodBomSheetSize)+":I100"])
+    prodBom.format("A"+str(prodBomSheetSize)+":I100", defaultFormat)
 
-    return None
+    # Generate Production BOM Data
+    genProdBom(bom)
 
 # prodBOM -- creates production BOM
 # input: bom spreadsheet object
@@ -194,7 +241,16 @@ def prodBOM(bom):
     # Existing sheet --> Update new fields
     numsheets = len(bom.worksheets())
     if (numsheets == 1): # New Production BOM
-        newProdBom(bom)
+
+        # create the new sheet
+        bom.add_worksheet(title="Production BOM", rows="100", cols="20") 
+
+        # Generate the header
+        genBomHeader(bom)
+
+        # Generate the BOM
+        genProdBom(bom)
+
     elif(numsheets == 2): # Existing Production BOM
 
         # Check if BOM was auto generated, and ask user
@@ -206,6 +262,7 @@ def prodBOM(bom):
             userChoice = input("""A Production BOM has already been generated. Would you like to update the current BOM? [y/n]:""")
             if(userChoice == "y" or userChoice == "Y"):
                 editProdBom(bom)
+
             elif(userChoice == "n" or userChoice == "N"):
                 print("Aborting operation...")
                 return None
@@ -216,7 +273,9 @@ def prodBOM(bom):
             userChoice = input("The production BOM sheet contains data not generated by the BOM tool. Would you like to overwrite this data? [y/n]:")
             if(userChoice == "y" or userChoice == "Y"):
                 bom.del_worksheet(prodBom)
-                newProdBom(bom)
+                bom.add_worksheet(title="Production BOM", rows="100", cols="20")
+                genBomHeader(bom)
+                genProdBom(bom)
             elif(userChoice == "n" or userChoice == "N"):
                 print("Aborting operation...")
                 return None
@@ -255,3 +314,4 @@ def parseInput(userin, bom):
     userin = input("BOM> ")
     parseInput(userin, bom)
 
+### END OF FILE
