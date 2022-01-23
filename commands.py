@@ -8,6 +8,10 @@ import sys
 from datetime import date
 import time
 
+# JSON Formatting Imports
+import jsonData
+json = jsonData.jsonData()
+
 ## Production BOM Basic Data
 
 # Convert Numbers to Letters
@@ -19,73 +23,6 @@ prodBomHead = ['Item No.', 'Designator', 'Qty','Manufacturer', 'Mfg Part No.',
 
 # Number of header rows 
 prodBomHeadRows = 7
-
-# Table Colors 
-lightGray = 239 
-darkGray = 204
-tableBorderGray = 220
-lightColor = {
-                 "backgroundColorStyle": {
-                    "rgbColor": {
-                        "red": 256 - lightGray,
-                        "green": 256 - lightGray,
-                        "blue": 256 - lightGray,
-                     }
-                  }
-               }
-darkColor = {
-                "backgroundColorStyle": {
-                    "rgbColor": {
-                        "red": 256 - darkGray,
-                        "green": 256 - darkGray,
-                        "blue": 256 - darkGray
-                     }
-                  }
-             }
-
-defaultFormat = {  
-                    "backgroundColor": {
-                        "red": 1 ,
-                        "green": 1,
-                        "blue": 1 
-                    },
-
-                    "borders": {
-                        "top": {
-                            "style": "SOLID", 
-                            "color": {
-                                "red": 256 - tableBorderGray,
-                                "green": 256 - tableBorderGray,
-                                "blue": 256 - tableBorderGray
-                            }
-                         },
-                        "bottom": {
-                            "style": "SOLID",
-                            "color": {
-                                "red": 256 - tableBorderGray,
-                                "green": 256 - tableBorderGray,
-                                "blue": 256 - tableBorderGray
-                            }
-                        },
-                        "left": {
-                            "style": "SOLID",
-                            "color": {
-                                "red": 256 - tableBorderGray,
-                                "green": 256 - tableBorderGray,
-                                "blue": 256 - tableBorderGray
-                            }
-                        },
-                        "right": {
-                            "style": "SOLID", 
-                            "color": {
-                                "red": 256 - tableBorderGray,
-                                "green": 256 - tableBorderGray,
-                                "blue": 256 - tableBorderGray
-                            }
-                        }
-                    } 
-                }
-
 
 # exitFunc -- quits the program
 def exitBOM(bom):
@@ -116,24 +53,9 @@ def genBomHeader(bom):
     prodBom.update("A3:B6", designHeadData[0])
     today = date.today().strftime("%m/%d/%Y")
     prodBom.update("B5", today)
-    prodBom.format("A1:I7", {
-                               "borders": {
-                                   "top": {
-                                       "style": "SOLID"
-                                   },
-                                   "bottom": {
-                                       "style": "SOLID"
-                                   },
-                                   "left": {
-                                       "style": "SOLID"
-                                   },
-                                   "right": {
-                                       "style": "SOLID"
-                                   }
-                               } 
-                            })
-    prodBom.format("A1:I6", lightColor)
-    prodBom.format("A7:I7", darkColor)
+    prodBom.format("A1:I7", json.borders)
+    prodBom.format("A1:I6", json.lightColor)
+    prodBom.format("A7:I7", json.darkColor)
 
 
 # newProdBom -- creates new production bom
@@ -174,31 +96,16 @@ def genProdBom(bom):
    
    # Add background color
    prodPartDataTableA = 'A8:I'+str(prodFinalRow)
-   prodBom.format(prodPartDataTableA, {
-                              "borders": {
-                                  "top": {
-                                      "style": "SOLID"
-                                  },
-                                  "bottom": {
-                                      "style": "SOLID"
-                                  },
-                                  "left": {
-                                      "style": "SOLID"
-                                  },
-                                  "right": {
-                                      "style": "SOLID"
-                                  }
-                              } 
-                           })
+   prodBom.format(prodPartDataTableA, json.borders)
    prodPartsTableA = 'A8:I'+str(prodFinalRow)
-   prodBom.format(prodPartsTableA, lightColor)
+   prodBom.format(prodPartsTableA, json.lightColor)
 
    # Make every other row dark
    row = 9 
    while row <= prodFinalRow:
        prodRowTablesA = 'A'+str(row)+':I'+str(row)
        row+=2
-       prodBom.format(prodRowTablesA, darkColor)
+       prodBom.format(prodRowTablesA, json.darkColor)
 
    # Write Marker Data to random cell to indicate bom 
    # was auto-generated
@@ -224,7 +131,7 @@ def editProdBom(bom):
     # Delete Extra BOM entries
     prodBomSheetSize = len(designBom.col_values(1))
     prodBom.batch_clear(["A"+str(prodBomSheetSize)+":I100"])
-    prodBom.format("A"+str(prodBomSheetSize)+":I100", defaultFormat)
+    prodBom.format("A"+str(prodBomSheetSize)+":I100", json.defaultFormat)
 
     # Generate Production BOM Data
     genProdBom(bom)
