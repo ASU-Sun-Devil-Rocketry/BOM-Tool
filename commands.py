@@ -20,6 +20,8 @@ ExcelCols = ['Null', 'A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 # Table Headers
 prodBomHead = ['Item No.', 'Designator', 'Qty','Manufacturer', 'Mfg Part No.', 
                 'Description/Value', 'Package/Footprint', 'Type', 'Notes']
+designBomHead = ['Qty', 'Component', 'Manufacturer', 'Part Number', 'Designator', 
+                 'Footprint', 'Footprint Type']
 
 # Number of header rows 
 prodBomHeadRows = 7
@@ -140,6 +142,20 @@ def editProdBom(bom):
 # input: bom spreadsheet object
 def prodBOM(bom):
     print("Creating Production BOM ...")
+
+    # Read BOM headers to check BOM format is correct
+    designBom = bom.get_worksheet(0)
+    designBomHeaders = designBom.row_values(7)
+    for headNo, head in enumerate(designBomHead):
+        if head != designBomHeaders[headNo]:
+            print('Error encountered while parsing BOM headers. The header "'  \
+                    + designBomHead[headNo] + '" is not a proper header or is' \
+                    'in the wrong position. The headers should be ordered: ')
+            print()
+            for itemNo, item in enumerate(designBomHead, 1):
+                print("\t" + str(itemNo) + ". " + item)
+            print()
+            return None
 
     # Check if production BOM exists and/or
     # create new sheet
