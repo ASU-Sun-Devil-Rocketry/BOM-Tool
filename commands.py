@@ -27,11 +27,11 @@ designBomHead = ['Qty', 'Component', 'Manufacturer', 'Part Number', 'Designator'
 prodBomHeadRows = 7
 
 # exitFunc -- quits the program
-def exitBOM(bom):
+def exitBOM(bom, Args):
    sys.exit()
 
 # helpFunc -- displays list of commands
-def helpFunc(bom):
+def helpFunc(bom, Args):
     print('BOM Tool Commands: \n')
 
 # genBomHeader -- Generates the production bom header 
@@ -140,7 +140,7 @@ def editProdBom(bom):
 
 # prodBOM -- creates production BOM
 # input: bom spreadsheet object
-def prodBOM(bom):
+def prodBOM(bom, Args):
     print("Creating Production BOM ...")
 
     # Read BOM headers to check BOM format is correct
@@ -226,10 +226,15 @@ def parseInput(userin, bom):
     # Get rid of any whitespace
     userin.strip()
 
+    # Split the input into commands and arguments
+    userinSplit = userin.split() 
+    userCommand = userinSplit[0]
+    CommandArgs = userinSplit[1:] 
+
     # Check if user input corresponds to a function
     for command in commands: 
-        if userin == command:
-           commands[command](bom)
+        if userCommand == command:
+           commands[command](bom, CommandArgs)
            return None
 
     # User input doesn't correspond to a command
