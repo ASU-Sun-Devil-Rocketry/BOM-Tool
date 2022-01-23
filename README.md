@@ -12,7 +12,8 @@ created using google sheets.</p>
 
 <h3>Installation Instructions</h3>
 <ol>
-   <li>Step 1<li>
-   <li>Step 2<li>
+   <li>Contact an SDR team lead for credentials file</li>
+   <li>Download the python google sheets api with <code>pip install --user ezsheets</code></li>
+   <li>Create a .gitignore file with python cache and credentials file</li>
 </ol>
 
