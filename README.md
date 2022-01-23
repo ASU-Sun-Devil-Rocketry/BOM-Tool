@@ -9,5 +9,10 @@ created using google sheets.</p>
 
 <h3>Data Files</h3>
 <p>pcbs.txt: contains a list of all PCB BOM urls</p>
-<h2>Installation Instructions</h2>
+
+<h3>Installation Instructions</h3>
+<ol>
+   <li>Step 1<li>
+   <li>Step 2<li>
+</ol>
 
