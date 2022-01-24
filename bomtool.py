@@ -104,6 +104,7 @@ def getOption(choice, options):
 pcbs = pcb()
 pcbs.loader()
 
+
 # Enter program loop
 while(True):
 
@@ -111,6 +112,6 @@ while(True):
    userin = input("BOM> ")
   
    # Parse respond to user input
-   commands.parseInput(userin, pcbs.bom)
+   commands.parseInput(userin, pcbs)
 
 ### PROGRAM END

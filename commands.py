@@ -7,6 +7,7 @@
 import sys
 from datetime import date
 import time
+import os
 
 # JSON Formatting Imports
 import jsonData
@@ -26,12 +27,12 @@ designBomHead = ['Qty', 'Component', 'Manufacturer', 'Part Number', 'Designator'
 # Number of header rows 
 prodBomHeadRows = 7
 
-# exitFunc -- quits the program
-def exitBOM(bom, Args):
+# exitBom -- quits the program
+def exitBOM(pcbs, Args):
    sys.exit()
 
 # helpFunc -- displays list of commands
-def helpFunc(bom, Args):
+def helpFunc(pcbs, Args):
     print('BOM Tool Commands: \n')
 
 # genBomHeader -- Generates the production bom header 
@@ -140,8 +141,11 @@ def editProdBom(bom):
 
 # prodBOM -- creates production BOM
 # input: bom spreadsheet object
-def prodBOM(bom, Args):
+def prodBOM(pcbs, Args):
     print("Creating Production BOM ...")
+
+    # BOM object
+    bom = pcbs.bom
 
     # Read BOM headers to check BOM format is correct
     designBom = bom.get_worksheet(0)
@@ -210,10 +214,10 @@ def prodBOM(bom, Args):
 
     print("Production BOM successfully created")
 
-# loadPCB -- Loads a new BOM into the program without closing the 
+# loadBOM -- Loads a new BOM into the program without closing the 
 #            BOM tool.
 # Inputs: PCB to load in standard notation
-def loadBOM(bom, Args):
+def loadBOM(pcbs, Args):
     # Check Input arguments
     if len(Args) != 1:
         print("BOM Error: Too many input arguments")
@@ -221,7 +225,12 @@ def loadBOM(bom, Args):
 
     # Check if the --list option has been supplied
     if (Args[0] == "--list"):
-        displayPCBs()
+        # Loop over pcbs and display options
+        print("Supported PCBs: ")
+        for count,board in enumerate(pcbs.pcblist, 1):
+            print('\t{}. {} - {}'.format(count, board, pcbs.pcbs[board][0]))
+        print()
+        return None
     
     # Argument must be a PCB
     PCB = Args[0]
@@ -236,19 +245,27 @@ def loadBOM(bom, Args):
 
         return None
 
+# clearConsole -- clears the python terminal
+def clearConsole(pcbs, Args):
+    command = 'clear'
+    if os.name in ('nt', 'dos'):
+        command = 'cls'
+    os.system(command)
+
 # Command List
 commands = { "exit": exitBOM,
              "production": prodBOM,
              "help": helpFunc,
-             "load": loadBOM
+             "load": loadBOM,
+             "clear": clearConsole
         }
 
 # parseInput -- checks user input against command list 
 #               options
 # input: userin: user inputed string
-#        bom: spreadsheet object
+#        pcbs: PCB bom object
 # output: none
-def parseInput(userin, bom): 
+def parseInput(userin, pcbs): 
 
     # Get rid of any whitespace
     userin.strip()
@@ -261,12 +278,12 @@ def parseInput(userin, bom):
     # Check if user input corresponds to a function
     for command in commands: 
         if userCommand == command:
-           commands[command](bom, CommandArgs)
+           commands[command](pcbs, CommandArgs)
            return None
 
     # User input doesn't correspond to a command
     print("Invalid BOM command")
     userin = input("BOM> ")
-    parseInput(userin, bom)
+    parseInput(userin, pcbs)
 
 ### END OF FILE
