@@ -161,7 +161,7 @@ def prodBOM(pcbs, Args):
     for headNo, head in enumerate(designBomHead):
         if head != designBomHeadersClean[headNo]:
             print('Error encountered while parsing BOM headers. The header "'  \
-                    + designBomHead[headNo] + '" is not a proper header or is ' \
+                    + designBomHeadersClean[headNo] + '" is not a proper header or is ' \
                     'in the wrong position. The headers should be ordered: ')
             print()
             for itemNo, item in enumerate(designBomHead, 1):
