@@ -48,8 +48,8 @@ class pcb:
         self.pcblist = list(self.pcblist)
 
     # Loader -- loads a specific PCB BOM revision into a spreadsheet
-    #            object 
-    def loader(self):
+    #            object, initLoader is used for first selection 
+    def initLoader(self):
         print('Loading PCBs...\n')
 
         # Display PCB Menu
@@ -69,6 +69,21 @@ class pcb:
 
         # Load the spreadsheet
         url = self.pcbs[pcbChoiceNum][rev]
+        gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
+        gsheet_client = gspread.authorize(gsheet_creds)
+        print('loading BOM spreadsheet...')
+        self.bom = gsheet_client.open_by_url(url)
+        print('BOM successfully loaded into program')
+
+    def loader(self, pcbChoice):
+
+        # Get User choice of revision number
+        rev = input("Enter the PCB revision: ")
+        numrevs = len(self.pcbs[pcbChoice]) -1
+        rev = getOption(rev, numrevs)
+
+        # Load the spreadsheet
+        url = self.pcbs[pcbChoice][rev]
         gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
         gsheet_client = gspread.authorize(gsheet_creds)
         print('loading BOM spreadsheet...')
@@ -102,8 +117,7 @@ def getOption(choice, options):
 
 # Load PCBs from txt file
 pcbs = pcb()
-pcbs.loader()
-
+pcbs.initLoader()
 
 # Enter program loop
 while(True):
@@ -112,6 +126,6 @@ while(True):
    userin = input("BOM> ")
   
    # Parse respond to user input
-   commands.parseInput(userin, pcbs)
+   pcbs = commands.parseInput(userin, pcbs)
 
 ### PROGRAM END
