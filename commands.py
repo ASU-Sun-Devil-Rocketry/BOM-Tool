@@ -157,10 +157,11 @@ def prodBOM(pcbs, Args):
     # Read BOM headers to check BOM format is correct
     designBom = bom.get_worksheet(0)
     designBomHeaders = designBom.row_values(7)
+    designBomHeadersClean = [x.strip() for x in designBomHeaders]
     for headNo, head in enumerate(designBomHead):
-        if head != designBomHeaders[headNo]:
+        if head != designBomHeadersClean[headNo]:
             print('Error encountered while parsing BOM headers. The header "'  \
-                    + designBomHead[headNo] + '" is not a proper header or is' \
+                    + designBomHead[headNo] + '" is not a proper header or is ' \
                     'in the wrong position. The headers should be ordered: ')
             print()
             for itemNo, item in enumerate(designBomHead, 1):
@@ -228,12 +229,13 @@ def prodBOM(pcbs, Args):
 # Inputs: PCB to load in standard notation
 def loadBOM(pcbs, Args):
     # Check Input arguments
-    if len(Args) != 1:
+    ArgsClean = [x.strip() for x in Args]
+    if len(ArgsClean) != 1:
         print("BOM Error: Too many input arguments")
         return pcbs
 
     # Check if the --list option has been supplied
-    if (Args[0] == "--list"):
+    if (ArgsClean[0] == "--list"):
         # Loop over pcbs and display options
         print("Supported PCBs: ")
         for count,board in enumerate(pcbs.pcblist, 1):
@@ -242,21 +244,20 @@ def loadBOM(pcbs, Args):
         return pcbs
     
     # Argument must be a PCB
-    PCB = Args[0]
+    PCB = ArgsClean[0]
     if(len(PCB) != 5):
         print("Invalid PCB. Check that the specified PCB exists and is supported" \
                 "by the BOM tool. (--list option)")
     for board in pcbs.pcblist:
         if board == PCB:
-            break
-        print("Invalid PCB. Check that the specified PCB exists and is supported" \
+            # Open pcbs.txt and scan for matching board
+            pcbs.loader(PCB)
+
+            # Return BOM object
+            return pcbs
+
+    print("Invalid PCB. Check that the specified PCB exists and is supported" \
                 "by the BOM tool. (--list option)")
-        return pcbs
-
-    # Open pcbs.txt and scan for matching board
-    pcbs.loader(PCB)
-
-    # Return BOM object
     return pcbs
 
 # clearConsole -- clears the python terminal
