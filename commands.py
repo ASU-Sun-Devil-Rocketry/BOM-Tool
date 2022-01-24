@@ -210,10 +210,37 @@ def prodBOM(bom, Args):
 
     print("Production BOM successfully created")
 
+# loadPCB -- Loads a new BOM into the program without closing the 
+#            BOM tool.
+# Inputs: PCB to load in standard notation
+def loadBOM(bom, Args):
+    # Check Input arguments
+    if len(Args) != 1:
+        print("BOM Error: Too many input arguments")
+        return None
+
+    # Check if the --list option has been supplied
+    if (Args[0] == "--list"):
+        displayPCBs()
+    
+    # Argument must be a PCB
+    PCB = Args[0]
+    if(len(PCB) != 5):
+        print("Invalid PCB. Check that the specified PCB exists and is supported" \
+                "by the BOM tool.")
+        return None
+
+    # Open pcbs.text and scan for matching board
+
+    # Create BOM object
+
+        return None
+
 # Command List
 commands = { "exit": exitBOM,
              "production": prodBOM,
-             "help": helpFunc
+             "help": helpFunc,
+             "load": loadBOM
         }
 
 # parseInput -- checks user input against command list 

@@ -18,7 +18,7 @@ class pcb:
 
     # Initializer- pcbdata contains source 
     #              file name
-    def __init__(self, pcbdata): 
+    def __init__(self, pcbdata="pcbs.txt"): 
        
         # Extract line data from txt file
         self.file = pcbdata
@@ -32,13 +32,48 @@ class pcb:
         for line in lines: 
            # Check if line starts with "h" for "https" 
            if(line[0] == 'h'):
+               # item is a link, add to PCB revision list
                self.pcbs[self.pcbnum].append(line)
            else: 
+               # Item is a PCB, create a new dictionary entry
                self.pcbnum = line[0:5]
+               # Start list with the name of the PCB 
                self.pcbs[self.pcbnum] = [line[6:-1]]
 
         # Determine Number of PCBs
         self.numpcbs = len(self.pcbs)
+
+        # List of pcbs
+        self.pcblist = self.pcbs.keys()
+        self.pcblist = list(self.pcblist)
+
+    # Loader -- loads a specific PCB BOM revision into a spreadsheet
+    #            object 
+    def loader(self):
+        print('Loading PCBs...\n')
+
+        # Display PCB Menu
+        print('Choose a PCB: ')
+        for count,board in enumerate(self.pcblist, 1):
+            print('\t{}. {} - {}'.format(count, board, self.pcbs[board][0]))
+
+        # Get User Choice
+        pcbChoice = input("Selection: ")
+        pcbChoice = getOption(pcbChoice, self.numpcbs) 
+        pcbChoiceNum = self.pcblist[pcbChoice-1] 
+
+        # Get User choice of revision number
+        rev = input("Enter the PCB revision: ")
+        numrevs = len(self.pcbs[pcbChoiceNum]) -1
+        rev = getOption(rev, numrevs)
+
+        # Load the spreadsheet
+        url = self.pcbs[pcbChoiceNum][rev]
+        gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
+        gsheet_client = gspread.authorize(gsheet_creds)
+        print('loading BOM spreadsheet...')
+        self.bom = gsheet_client.open_by_url(url)
+        print('BOM successfully loaded into program')
 
 # getOption -- Recursively ask the user for a new selection
 #              until a valid option is entered
@@ -66,33 +101,8 @@ def getOption(choice, options):
 ### CODE START ### 
 
 # Load PCBs from txt file
-pcbs = pcb("pcbs.txt")
-pcbtable = []
-print('Loading PCBs...\n')
-
-# Display PCB Menu
-print('Choose a PCB: ')
-for count,board in enumerate(pcbs.pcbs, 1):
-    print('\t{}. {} - {}'.format(count, board, pcbs.pcbs[board][0]))
-    pcbtable.append(board)
-
-# Get User Choice
-pcbChoice = input("Selection: ")
-pcbChoice = getOption(pcbChoice, pcbs.numpcbs) 
-pcbChoiceNum = pcbtable[pcbChoice-1] 
-
-# Get User choice of revision number
-rev = input("Enter the PCB revision: ")
-numrevs = len(pcbs.pcbs[pcbChoiceNum]) -1
-rev = getOption(rev, numrevs)
-
-# Load the spreadsheet
-url = pcbs.pcbs[pcbChoiceNum][rev]
-gsheet_creds = ServiceAccountCredentials.from_json_keyfile_name("credentials-sheets.json", scope)
-gsheet_client = gspread.authorize(gsheet_creds)
-print('loading BOM spreadsheet...')
-bom = gsheet_client.open_by_url(url)
-print('BOM successfully loaded into program')
+pcbs = pcb()
+pcbs.loader()
 
 # Enter program loop
 while(True):
@@ -101,6 +111,6 @@ while(True):
    userin = input("BOM> ")
   
    # Parse respond to user input
-   commands.parseInput(userin, bom)
+   commands.parseInput(userin, pcbs.bom)
 
 ### PROGRAM END
